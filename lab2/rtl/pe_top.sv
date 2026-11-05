@@ -244,8 +244,43 @@ module pe_top #(
 
   // <-- declare acc_q and mac_result here
 
+    logic signed [ACC_W-1:0] acc_q;
+    logic signed [ACC_W-1:0] mac_result;
+
   // <-- instantiate mac_unit, accumulator, relu_unit here
 
+    mac_unit #(
+        .DATA_W (DATA_W),
+        .ACC_W (ACC_W)
+    ) u_mac (
+        .act_i (act_i),
+        .wgt_i (wgt_i),
+        .acc_i (acc_q),
+        .result_o (mac_result)
+    );
+
+    accumulator #(
+        .ACC_W (ACC_W)
+    ) u_acc (
+        .clk_i (clk_i),
+        .rst_ni (rst_ni),
+        .clear_i (clear_i),
+        .en_i (valid_i), 
+        .d_i (mac_result),
+        .q_o (acc_q) 
+    );
+
+    relu_unit #(
+        .ACC_W (ACC_W)
+    ) u_relu (
+        .x_i (acc_q),
+        .y_o (relu_o)
+    );
+
+
   // <-- drive sum_o and relu_o here
+
+  assign sum_o = acc_q;
+
 
 endmodule

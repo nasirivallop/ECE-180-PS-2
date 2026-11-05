@@ -174,7 +174,11 @@ module tb_pe;
     //   4. check("test2 relu", relu_o,   0);
     // ========================================================================
 
-
+    do_clear();
+    send(8'sd2, -8'sd4);
+    send(8'sd3, -8'sd5);
+    check("test2 sum", sum_o, -23);
+    check("test2 relu", relu_o, 0);
 
     // ========================================================================
     // TEST 3 -- YOUR TURN: does clear_i actually work?
@@ -193,7 +197,16 @@ module tb_pe;
     //      and has no contamination from step 2
     // ========================================================================
 
-
+    do_clear();
+    send(8'sd10, 8'sd10);
+    send(-8'sd3, 8'sd7);
+    check("test3 first sum", sum_o, 79); 
+    do_clear();
+    check("test3 after clear", sum_o, 0);
+    send(8'sd6, -8'sd2);
+    send(8'sd1,  8'sd9);
+    check("test3 second sum", sum_o, -3); 
+    check("test3 second relu", relu_o, 0);
 
     // ========================================================================
     // TEST 4 -- YOUR TURN (if you have time): does valid_i gate correctly?
@@ -209,8 +222,12 @@ module tb_pe;
     //          repeat (3) @(posedge clk_i);
     //   3. check sum_o is UNCHANGED -- the junk must not have accumulated
     // ========================================================================
-
-
+    do_clear();
+    send(8'sd7, 8'sd3);
+    check("test4 before idle", sum_o, 21);
+    @(negedge clk_i); act_i = 8'sd99; wgt_i = 8'sd99; 
+    repeat (3) @(posedge clk_i);
+    check("test4 after idle", sum_o, 21);
 
     // ------------------------------------------------------------------------
     // Verdict. Always print one. A testbench that scrolls past without a
